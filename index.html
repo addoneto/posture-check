@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>POSTURE CHECK</title>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600&display=swap');
+
+        :root{
+            --cursor-border: 2px;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Montserrat', sans-serif;
+            cursor:none;
+        }
+        body{
+            width: 100vw;
+            max-width: 100%;
+            height: 100vh;
+
+            display: grid;
+            place-items: center;
+            
+            background-color: #202529;
+        }
+        #cursor{
+            width: 20px;
+            height: 20px;
+            border: var(--cursor-border) solid #414141;
+            border-radius: 50%;
+            position: fixed;
+            transition: 50ms ease-out;
+            pointer-events: none;
+        }
+        #clock{
+            width: 50vh;
+            height: 50vh;
+
+            border: 2px solid #3a4549;
+            border-radius: 50%;
+            box-shadow: 0px 0px 50px 5px rgba(0, 0, 0, 0.2);
+
+            display: flex;
+            align-items: flex-end;
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+        #clock #fill{
+            width: 100%;
+            height: 0%;
+            background-color: #257eeb;
+            background-image: url("https://www.transparenttextures.com/patterns/asfalt-light.png");
+            bottom: 0;
+            transition: 1s;
+        }
+        main{
+            text-align: center;
+        }
+        main label{
+            color: #4a4e52;
+            font-size: 1.5rem;
+            letter-spacing: .2rem;
+        }
+        main input{
+            background-color: transparent;
+            border: 0;
+            color: #ffffff;
+            font-size: 3rem;
+            width: 5vw;
+            text-align: center;
+        }
+        main span{
+            color: #a2a3a4;
+        }
+        main button{
+            margin-top:2rem;
+            border: 2px solid  #3a4549;
+            border-radius: 5px;
+            padding: .5rem 3rem;
+            background-color: transparent;
+            transition: .2s;
+        }
+        main button:hover{
+            /* --cursor-border: 10px; */
+            background-color: #3a4549;
+        }
+        audio{
+            display: none;
+        }
+        input:focus, button:focus{ outline: none;}
+    </style>
+</head>
+<body>
+    <main>
+        <div id="clock">
+            <div id="fill"></div>
+        </div>
+
+        <label>Intervalo</label> <br>
+        <input type="text" value="30"> <span>MIN</span> <br>
+
+        <button onclick="playpause()">
+            <svg width="25" 
+                height="25" 
+                viewBox="0 0 355 404"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg">
+
+                <path d="M345 184.679C358.333 192.377 358.333 211.622 345 219.32L30 401.186C16.6667 408.884 0 399.261 0 383.865V20.1347C0 4.73868 16.6667 -4.88384 30 2.81416L345 184.679Z"
+                fill="#3487EC"/>
+            </svg>
+        </button>
+    </main>
+
+    <audio controls src="https://media1.vocaroo.com/mp3/16t5sgSxnKBm" type="audio/mpeg"></audio>
+
+
+    <div id="cursor"></div>
+
+    <script>
+        const alarmAudio = document.querySelector('audio');
+        alarmAudio.volume = 0.2;
+
+        let time = false;
+        let currentTime = 0;
+        let maxTime = 0;
+
+        const cursor = document.getElementById('cursor');
+        const svg = document.querySelector('button svg');
+        const clockFill = document.querySelector('#clock #fill');
+
+        document.addEventListener('mousemove', e => {
+            cursor.setAttribute('style', `top: ${e.pageY-10}px;left: ${e.pageX-10}px;`);
+        });
+
+        function playpause(){
+            time = !time;
+            alarmAudio.pause();
+
+            if(time){
+                svg.innerHTML = `
+                <path d="M0 20C0 8.9543 8.95431 0 20 0H93C104.046 0 113 8.95431 113 20V384C113 395.046 104.046 404 93 404H20C8.95431 404 0 395.046 0 384V20Z" fill="#3487EC"/>
+                <path d="M233 20C233 8.9543 241.954 0 253 0H335C346.046 0 355 8.95431 355 20V384C355 395.046 346.046 404 335 404H253C241.954 404 233 395.046 233 384V20Z" fill="#3487EC"/>`;
+            
+                maxTime = document.querySelector('input').value * 60;
+
+                setInterval(updateTimer, 20000);
+            }else{
+                svg.innerHTML = `
+                <path d="M345 184.679C358.333 192.377 358.333 211.622 345 219.32L30 401.186C16.6667 408.884 0 399.261 0 383.865V20.1347C0 4.73868 16.6667 -4.88384 30 2.81416L345 184.679Z"
+                fill="#3487EC"/>`;
+
+                currentTime = 0;
+                clockFill.style.height = '0%';
+            }
+        }
+
+        function updateTimer(){
+            if(!time) return;
+
+            currentTime += 20;
+            clockFill.style.height = map(currentTime, 0, maxTime, 0, 100) + '%';
+
+            if(currentTime >= maxTime){
+                currentTime = 0;
+                time = false;
+                alarmAudio.currentTime = 0;
+                alarmAudio.play();
+            }
+        }
+
+        function map(x, in_min, in_max, out_min, out_max) {
+            return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+        }
+    </script>
+</body>
+</html>
