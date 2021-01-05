@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -92,6 +92,14 @@
         audio{
             display: none;
         }
+        footer{
+            position: absolute;
+            left: 50%;
+            bottom: 15px;
+            transform: translateX(-50%);
+            color: #3a4549;
+            font-weight: 500;
+        }
         input:focus, button:focus{ outline: none;}
     </style>
 </head>
@@ -122,6 +130,10 @@
 
     <div id="cursor"></div>
 
+    <footer>
+        <h3>by addo.</h3>
+    </footer>
+
     <script>
         const alarmAudio = document.querySelector('audio');
         alarmAudio.volume = 0.2;
@@ -140,7 +152,6 @@
 
         function playpause(){
             time = !time;
-            alarmAudio.pause();
 
             if(time){
                 svg.innerHTML = `
@@ -148,8 +159,6 @@
                 <path d="M233 20C233 8.9543 241.954 0 253 0H335C346.046 0 355 8.95431 355 20V384C355 395.046 346.046 404 335 404H253C241.954 404 233 395.046 233 384V20Z" fill="#3487EC"/>`;
             
                 maxTime = document.querySelector('input').value * 60;
-
-                setInterval(updateTimer, 20000);
             }else{
                 svg.innerHTML = `
                 <path d="M345 184.679C358.333 192.377 358.333 211.622 345 219.32L30 401.186C16.6667 408.884 0 399.261 0 383.865V20.1347C0 4.73868 16.6667 -4.88384 30 2.81416L345 184.679Z"
@@ -158,12 +167,14 @@
                 currentTime = 0;
                 clockFill.style.height = '0%';
             }
+            
+            alarmAudio.pause();
         }
 
         function updateTimer(){
             if(!time) return;
 
-            currentTime += 20;
+            currentTime += 10;
             clockFill.style.height = map(currentTime, 0, maxTime, 0, 100) + '%';
 
             if(currentTime >= maxTime){
@@ -177,6 +188,8 @@
         function map(x, in_min, in_max, out_min, out_max) {
             return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
         }
+
+        setInterval(updateTimer, 10000);
     </script>
 </body>
 </html>
